@@ -8,14 +8,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import Display.NoConnection;
+
 public class DbStart {
 	// JDBC driver name and database URL
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://db4free.net/toronyfutas";
+	static final String JDBC_DRIVER = General.JDBC_DRIVER;
+	static final String DB_URL = General.DB_URL;
+	static boolean warning = true;
 
 	// Database credentials
-	static final String USER = "torony";
-	static final String PASS = "torony";
+	static final String USER = General.USER;
+	static final String PASS = General.PASS;
 
 	public static void insertData(String CardID, String Start) {
 		Connection conn = null;
@@ -36,13 +39,13 @@ public class DbStart {
 					+ CardID + "' and Start is null";
 			ResultSet isnull = stmt.executeQuery(sql);
 			isnull.beforeFirst();
-			boolean bolla=!isnull.next();
+			boolean bolla = !isnull.next();
 
 			sql = "SELECT `Id`, `CardID`, `Name`, `E-mail`, `Start`, `End`, `time`, `modifiedDate` FROM `Runner` where CardID ='"
 					+ CardID + "' and Start is not null";
 			ResultSet isnotnull = stmt.executeQuery(sql);
 			isnotnull.beforeFirst();
-			boolean bol=!isnotnull.next();
+			boolean bol = !isnotnull.next();
 
 			if (bol) {
 				if (bolla) {
@@ -62,10 +65,10 @@ public class DbStart {
 					System.out.println("no Start");
 					// create the java mysql update preparedstatement
 					String query = "UPDATE `Runner` SET Start = ? where CardID = ?";
-					PreparedStatement preparedStmt = conn.prepareStatement(query);
+					PreparedStatement preparedStmt = conn
+							.prepareStatement(query);
 					preparedStmt.setString(1, Start);
 					preparedStmt.setString(2, CardID);
-				
 
 					// execute the java preparedstatement
 					preparedStmt.executeUpdate();
@@ -80,6 +83,11 @@ public class DbStart {
 		} catch (SQLException se) {
 			// Handle errors for JDBC
 			se.printStackTrace();
+			if (warning) {
+				NoConnection.set();
+				warning = false;
+			}
+
 		} catch (Exception e) {
 			// Handle errors for Class.forName
 			e.printStackTrace();

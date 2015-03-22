@@ -18,9 +18,12 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
-import CardReader.RFID;
+import CardReader.NFC;
 import Data.CardData;
 import Data.UserData;
+
+import java.awt.Color;
+import java.awt.SystemColor;
 
 public class Menu {
 
@@ -28,7 +31,7 @@ public class Menu {
 	private JPanel fomenu;
 	CardData cardData = new CardData();
 	UserData userData = new UserData();
-	RFID rfid = new RFID(cardData);
+	NFC nfc;
 	private JTextField txtName;
 	private JTextField txtEmail;
 	private JTextField cardID;
@@ -85,31 +88,64 @@ public class Menu {
 		panel_2.add(btnReadCard);
 
 		cardID = new JTextField();
-		cardID.setEditable(false);
 		panel_2.add(cardID);
 		cardID.setColumns(10);
+		
+		JTextPane txtpnReadFail = new JTextPane();
+		txtpnReadFail.setForeground(new Color(255, 0, 0));
+		txtpnReadFail.setBackground(SystemColor.menu);
+		txtpnReadFail.setEditable(false);
+		txtpnReadFail.setText("Nem sikerült beolvasni a kártyát.");
+		txtpnReadFail.setVisible(false);
+		panel_2.add(txtpnReadFail);
 		btnReadCard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				cardID.setText(rfid.readOneCard());
+				
+				String readedCard;
+				try {
+					readedCard = nfc.readOneCard();
+					cardID.setText(readedCard);
+					cardID.setEnabled(false);
+					txtpnReadFail.setVisible(false);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					txtpnReadFail.setVisible(true);
+				}
 			}
 		});
 
 		JPanel panel_1 = new JPanel();
 		registWindow.add(panel_1);
+		panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 5));
+		
+		JTextPane txtpnNv = new JTextPane();
+		txtpnNv.setEditable(false);
+		txtpnNv.setBackground(SystemColor.menu);
+		txtpnNv.setText("Full name");
+		panel_1.add(txtpnNv);
 
 		txtName = new JTextField();
 		txtName.setText("Name");
 		panel_1.add(txtName);
-		txtName.setColumns(20);
+		txtName.setColumns(25);
 
 		JPanel panel = new JPanel();
+		FlowLayout flowLayout_1 = (FlowLayout) panel.getLayout();
+		flowLayout_1.setHgap(30);
+		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		registWindow.add(panel);
+		
+		JTextPane txtpnEmail = new JTextPane();
+		txtpnEmail.setText("Email");
+		txtpnEmail.setEditable(false);
+		txtpnEmail.setBackground(SystemColor.menu);
+		panel.add(txtpnEmail);
 
 		txtEmail = new JTextField();
 		txtEmail.setText("Email");
 		panel.add(txtEmail);
-		txtEmail.setColumns(20);
+		txtEmail.setColumns(25);
 
 		JPanel panel_3 = new JPanel();
 		registWindow.add(panel_3);
@@ -118,10 +154,21 @@ public class Menu {
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				userData.put(cardID.getText(), txtName.getText(), txtEmail.getText());
+				cardID.setEnabled(true);
+				txtpnReadFail.setVisible(false);
+				cardID.setText("");
+				txtName.setText("");
+				txtEmail.setText("");
 			}
 		});
 		panel_3.add(btnSave);
 
+		
+		JMenuItem mntmRegistration = new JMenuItem("Registration");
+		JMenuItem mntmEnd = new JMenuItem("End");
+		JMenuItem mntmStart = new JMenuItem("Start");
+		JMenuItem mntmConvertToXml = new JMenuItem("Convert to XML");
+		
 		JPanel startWindow = new JPanel();
 		fomenu.add(startWindow, "startWindow");
 		startWindow.setLayout(new BoxLayout(startWindow, BoxLayout.X_AXIS));
@@ -129,37 +176,64 @@ public class Menu {
 		JButton btnReadCards = new JButton("Read cards");
 		btnReadCards.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				rfid.start();
-				c1.show(fomenu, "endWindow");
+				nfc = new NFC(cardData,0);
+				nfc.setLevel(0); // ezzel a start fog elindulni
+				nfc.start();
+				c1.show(fomenu, "stopWindow");
+				mntmEnd.setEnabled(false);
+				mntmStart.setEnabled(false);
 			}
 		});
 		startWindow.add(btnReadCards);
 
-		// a startwindow-val kezdünk.
-		c1.show(fomenu, "startWindow");
 
 		JTextPane txtpnHaARead = new JTextPane();
 		txtpnHaARead
-				.setText("Ha a Read cards gomra kattintasz, elkezdőik a kártyák olvasása");
+				.setText("Ha a Read cards gomra kattintasz, elkezdőik a kártyák olvasása és a starthoz rögzítésre kerülnek az időbélyegeik.");
 		startWindow.add(txtpnHaARead);
-
+		
 		JPanel endWindow = new JPanel();
 		fomenu.add(endWindow, "endWindow");
 		endWindow.setLayout(new BoxLayout(endWindow, BoxLayout.X_AXIS));
+		
+		JButton button = new JButton("Read cards");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				nfc = new NFC(cardData,1);
+				nfc.setLevel(1); // ezzel az end fog elindulni
+				nfc.start();
+				c1.show(fomenu, "stopWindow");
+				mntmEnd.setEnabled(false);
+				mntmStart.setEnabled(false);
+			}
+		});
+		endWindow.add(button);
+		
+		JTextPane txtpnHaARead_1 = new JTextPane();
+		txtpnHaARead_1.setText("Ha a Read cards gomra kattintasz, elkezdőik a kártyák olvasása, és rögzítésre kerülnek a célállomáshoz.");
+		endWindow.add(txtpnHaARead_1);
+
+		JPanel stopWindow = new JPanel();
+		fomenu.add(stopWindow, "stopWindow");
+		stopWindow.setLayout(new BoxLayout(stopWindow, BoxLayout.X_AXIS));
+		JTextPane txtpnHaAStop = new JTextPane();
+		txtpnHaAStop
+				.setText("Ha a stop reading gombra kattintasz akkor megáll a kártyák beolvasása.");
+		stopWindow.add(txtpnHaAStop);
 
 		JButton btnStopReading = new JButton("Stop reading");
 		btnStopReading.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				rfid.done();
-				cardData.printCards();
+				nfc.done();
+				
+				//btnStopReading.setEnabled(false);
+				String log = cardData.printCards();
+				txtpnHaAStop.setText("A következő kártya logok történtek: \n" + log);
 			}
 		});
-		endWindow.add(btnStopReading);
+		stopWindow.add(btnStopReading);
 
-		JTextPane txtpnHaAStop = new JTextPane();
-		txtpnHaAStop
-				.setText("Ha a stop reading gombra kattintasz akkor megáll a kártyák beolvasása.");
-		endWindow.add(txtpnHaAStop);
+		
 
 		JPanel writexmlWindow = new JPanel();
 		fomenu.add(writexmlWindow, "writexmlWindow");
@@ -170,29 +244,39 @@ public class Menu {
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
-		JMenuItem mntmRegistration = new JMenuItem("Registration");
+
+		
+		mntmRegistration.setSelected(true);
+		mnFile.add(mntmRegistration);
+		mnFile.add(mntmStart);
+		mnFile.add(mntmEnd);
+		mnFile.add(mntmConvertToXml);
+		
 		mntmRegistration.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				c1.show(fomenu, "registerWindow");
 			}
 		});
-		mnFile.add(mntmRegistration);
-
-		JMenuItem mntmStart = new JMenuItem("Start");
+		
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				c1.show(fomenu, "startWindow");
 			}
 		});
-		mnFile.add(mntmStart);
-
-		JMenuItem mntmConvertToXml = new JMenuItem("Convert to XML");
+		
+		mntmEnd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				c1.show(fomenu,  "endWindow");
+			}
+		});
+		
 		mntmConvertToXml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				c1.show(fomenu, "writexmlWindow");
 			}
 		});
-		mnFile.add(mntmConvertToXml);
+		
+
 	}
 
 }

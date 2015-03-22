@@ -13,38 +13,42 @@ import javax.smartcardio.TerminalFactory;
 
 import Data.CardData;
 
-public class RFID extends Thread {
+public class NFC extends Thread {
 	private volatile Thread blinker;
 	CardData cards;
+	int level;
 
-	public RFID(CardData cards) {
+	public NFC(CardData cards,int level) {
 		super();
 		this.cards = cards;
+		this.level = level;
 	}
 
 	public void run() {
 		Thread thisThread = Thread.currentThread();
 		blinker = Thread.currentThread();
 		try {
-			// Display the list of terminals
-			TerminalFactory factory = TerminalFactory.getDefault();
-			List<CardTerminal> terminals = factory.terminals().list();
+		
+		//	TerminalFactory factory = TerminalFactory.getDefault();
+		//	List<CardTerminal> terminals = factory.terminals().list();
 
-			// Use the first terminal
-			CardTerminal terminal = terminals.get(0);
+			
+		//	CardTerminal terminal = terminals.get(0);
 			do {
-				/////itt figyelj
+
+			//	cards.put(cardRead(terminal), ,level); 
 				
+				cards.put("jani", getCurrentTimeStamp(), level);
+				Thread.sleep(1000);
+				cards.put("bela", getCurrentTimeStamp(), level);
+				Thread.sleep(1000);
+				cards.put("ada0", getCurrentTimeStamp(), level);
+				Thread.sleep(1000);
+				cards.put("ada1", getCurrentTimeStamp(), level);
+				Thread.sleep(1000);
+				cards.put("ada2", getCurrentTimeStamp(), level);
+				Thread.sleep(5000);
 				
-				
-				cards.put(cardRead(terminal), getCurrentTimeStamp(),0); //// itt azért van nulla mert akkor a start indul el.
-				
-				/////
-				
-				
-				
-				
-				/////
 			} while (blinker == thisThread);
 
 		} catch (Exception e1) {
@@ -57,7 +61,11 @@ public class RFID extends Thread {
 		blinker = null;
 	}
 	
-	public String readOneCard(){
+	public void setLevel(int level){
+		this.level = level;
+	}
+	
+	public String readOneCard() throws Exception{
 		try {
 			// Display the list of terminals
 			TerminalFactory factory = TerminalFactory.getDefault();
@@ -69,17 +77,14 @@ public class RFID extends Thread {
 
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			throw e1;
 		}
-		return null;
-		
 	}
 
 	private String cardRead(CardTerminal terminal) throws Exception {
 		try {
 
-			while (!terminal.waitForCardPresent(1000))
-				;
+			while (!terminal.waitForCardPresent(1000));
 			// Connect with the card
 			Card card = terminal.connect("*");
 			CardChannel channel = card.getBasicChannel();

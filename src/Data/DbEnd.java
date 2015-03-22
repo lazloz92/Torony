@@ -8,14 +8,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import Display.NoConnection;
+
 public class DbEnd {
 	// JDBC driver name and database URL
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://db4free.net/toronyfutas";
-
+	static final String JDBC_DRIVER = General.JDBC_DRIVER;
+	static final String DB_URL = General.DB_URL;
+	static boolean warning = true;
 	// Database credentials
-	static final String USER = "torony";
-	static final String PASS = "torony";
+	static final String USER = General.USER;
+	static final String PASS = General.PASS;
 
 	public static void insertData(String CardID, String End) {
 		Connection conn = null;
@@ -83,6 +85,10 @@ public class DbEnd {
 		} catch (Exception e) {
 			// Handle errors for Class.forName
 			e.printStackTrace();
+			if (warning) {
+				NoConnection.set();
+				warning = false;
+			}
 		} finally {
 			// finally block used to close resources
 			try {

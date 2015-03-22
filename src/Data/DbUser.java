@@ -8,14 +8,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import Display.NoConnection;
+
 public class DbUser {
 	// JDBC driver name and database URL
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://db4free.net/toronyfutas";
+	static final String JDBC_DRIVER = General.JDBC_DRIVER;
+	static final String DB_URL = General.DB_URL;
 
 	// Database credentials
-	static final String USER = "torony";
-	static final String PASS = "torony";
+	static final String USER = General.USER;
+	static final String PASS = General.PASS;
 
 	public static void insertData(String CardID, String Name, String Email) {
 		Connection conn = null;
@@ -74,7 +76,7 @@ public class DbUser {
 					preparedStmt.executeUpdate();
 				}
 			}
-
+			
 			// STEP 6: Clean-up environment
 			isnotnull.close();
 			isnull.close();
@@ -83,6 +85,9 @@ public class DbUser {
 		} catch (SQLException se) {
 			// Handle errors for JDBC
 			se.printStackTrace();
+			
+			NoConnection.set();
+
 		} catch (Exception e) {
 			// Handle errors for Class.forName
 			e.printStackTrace();

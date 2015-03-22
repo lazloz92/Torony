@@ -12,7 +12,9 @@ public class CardData {
 	}
 
 	public void put(String key, String value, int i) {
-		cards.put(key, value);
+
+		if (!cards.containsKey(key))
+			cards.put(key, value);
 
 		if (i == 0)
 			DbStart.insertData(key, value);
@@ -20,11 +22,13 @@ public class CardData {
 			DbEnd.insertData(key, value);
 	}
 
-	public void printCards() {
+	public String printCards() {
+		String log = "";
 		for (String key : cards.keySet()) {
 			System.out.println(key + " : " + cards.get(key));
+			log += key + " : " + cards.get(key) + "\n";
 		}
-
+		return log;
 	}
 
 }
