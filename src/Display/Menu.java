@@ -100,11 +100,9 @@ public class Menu {
 		panel_2.add(txtpnReadFail);
 		btnReadCard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				String readedCard;
 				try {
-					readedCard = nfc.readOneCard();
-					cardID.setText(readedCard);
+					nfc = new NFC();
+					cardID.setText(nfc.readOneCard());
 					cardID.setEnabled(false);
 					txtpnReadFail.setVisible(false);
 				} catch (Exception e1) {

@@ -18,6 +18,11 @@ public class NFC extends Thread {
 	CardData cards;
 	int level;
 
+	public NFC(){
+		
+	}
+	
+	
 	public NFC(CardData cards,int level) {
 		super();
 		this.cards = cards;
@@ -29,25 +34,13 @@ public class NFC extends Thread {
 		blinker = Thread.currentThread();
 		try {
 		
-		//	TerminalFactory factory = TerminalFactory.getDefault();
-		//	List<CardTerminal> terminals = factory.terminals().list();
-
-			
-		//	CardTerminal terminal = terminals.get(0);
+			TerminalFactory factory = TerminalFactory.getDefault();
+			List<CardTerminal> terminals = factory.terminals().list();
+			CardTerminal terminal = terminals.get(0);
 			do {
 
-			//	cards.put(cardRead(terminal), ,level); 
+				cards.put(cardRead(terminal),getCurrentTimeStamp(),level); 
 				
-				cards.put("jani", getCurrentTimeStamp(), level);
-				Thread.sleep(1000);
-				cards.put("bela", getCurrentTimeStamp(), level);
-				Thread.sleep(1000);
-				cards.put("ada0", getCurrentTimeStamp(), level);
-				Thread.sleep(1000);
-				cards.put("ada1", getCurrentTimeStamp(), level);
-				Thread.sleep(1000);
-				cards.put("ada2", getCurrentTimeStamp(), level);
-				Thread.sleep(5000);
 				
 			} while (blinker == thisThread);
 
