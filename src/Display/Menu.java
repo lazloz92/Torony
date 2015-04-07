@@ -20,10 +20,16 @@ import javax.swing.SwingConstants;
 
 import CardReader.NFC;
 import Data.CardData;
+import Data.DBRunner;
+import Data.Runner;
 import Data.UserData;
 
 import java.awt.Color;
 import java.awt.SystemColor;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Menu {
 
@@ -198,7 +204,7 @@ public class Menu {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				nfc = new NFC(cardData,1);
-				nfc.setLevel(1); // ezzel az end fog elindulni
+				nfc.setLevel(1); // ezzel az end fog elindulni.
 				nfc.start();
 				c1.show(fomenu, "stopWindow");
 				mntmEnd.setEnabled(false);
@@ -235,6 +241,39 @@ public class Menu {
 
 		JPanel writexmlWindow = new JPanel();
 		fomenu.add(writexmlWindow, "writexmlWindow");
+		
+		JPanel eredmeny = new JPanel();
+		fomenu.add(eredmeny, "eredmeny");
+		eredmeny.setLayout(new BoxLayout(eredmeny, BoxLayout.PAGE_AXIS));
+		
+		JTextPane textPane = new JTextPane();
+		eredmeny.add(textPane);
+		
+		JButton btnEredmnyGenerls = new JButton("Eredmény generálás");
+		btnEredmnyGenerls.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				List<Runner> runners = new ArrayList<Runner>();
+				DBRunner.selectData(runners);
+				
+				for (Runner runner : runners){
+					runner.getTime();
+				}
+				
+				Collections.sort(runners, new Runner.OrderByTime());
+				String log="";
+				for (Runner runner : runners){
+					System.out.print(runner.getCardID() + "   ");
+					log+=runner.getCardID() + "   ";
+					System.out.println(runner.getTime());
+					log+=runner.getTime() + "\n";
+				}
+				textPane.setText(log);
+			}
+		});
+		btnEredmnyGenerls.setAlignmentX(0.5f);
+		eredmeny.add(btnEredmnyGenerls);
+		
+
 
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -249,6 +288,14 @@ public class Menu {
 		mnFile.add(mntmStart);
 		mnFile.add(mntmEnd);
 		mnFile.add(mntmConvertToXml);
+		
+		JMenuItem mntmEredmny = new JMenuItem("Eredmény gen.");
+		mntmEredmny.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				c1.show(fomenu, "eredmeny");
+			}
+		});
+		mnFile.add(mntmEredmny);
 		
 		mntmRegistration.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {

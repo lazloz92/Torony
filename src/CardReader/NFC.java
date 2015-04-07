@@ -84,6 +84,7 @@ public class NFC extends Thread {
 
 			// Send Select Applet command
 			byte[] aid = { (byte) 0xFF, (byte) 0xCA, 0x00, 0x00, 0x04 };
+			//byte[] aid = { (byte) 0xFF, (byte) 0x40, (byte) 0x50, (byte) 0x04, (byte) 0x05, (byte) 0xC05, (byte) 0x03, (byte) 0x01, };
 			ResponseAPDU answer = channel.transmit(new CommandAPDU(aid));
 
 			byte r[] = answer.getBytes();
@@ -103,7 +104,7 @@ public class NFC extends Thread {
 
 	private String getCurrentTimeStamp() {
 		SimpleDateFormat sdfDate = new SimpleDateFormat(
-				"yyyy-MM-dd HH:mm:ss.SSS");
+				"HH:mm:ss.SSS");
 		Date now = new Date();
 		String strDate = sdfDate.format(now);
 		return strDate;
