@@ -30,6 +30,8 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.JScrollPane;
+import javax.swing.JScrollBar;
 
 public class Menu {
 
@@ -96,7 +98,11 @@ public class Menu {
 		cardID = new JTextField();
 		panel_2.add(cardID);
 		cardID.setColumns(10);
-		
+
+		JButton btnStopReading = new JButton("Stop reading");
+		JMenuItem mntmStart = new JMenuItem("Start");
+		JMenuItem mntmEnd = new JMenuItem("Cél");
+
 		JTextPane txtpnReadFail = new JTextPane();
 		txtpnReadFail.setForeground(new Color(255, 0, 0));
 		txtpnReadFail.setBackground(SystemColor.menu);
@@ -122,7 +128,7 @@ public class Menu {
 		JPanel panel_1 = new JPanel();
 		registWindow.add(panel_1);
 		panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 5));
-		
+
 		JTextPane txtpnNv = new JTextPane();
 		txtpnNv.setEditable(false);
 		txtpnNv.setBackground(SystemColor.menu);
@@ -139,7 +145,7 @@ public class Menu {
 		flowLayout_1.setHgap(30);
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		registWindow.add(panel);
-		
+
 		JTextPane txtpnEmail = new JTextPane();
 		txtpnEmail.setText("Email");
 		txtpnEmail.setEditable(false);
@@ -157,7 +163,8 @@ public class Menu {
 		JButton btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				userData.put(cardID.getText(), txtName.getText(), txtEmail.getText());
+				userData.put(cardID.getText(), txtName.getText(),
+						txtEmail.getText());
 				cardID.setEnabled(true);
 				txtpnReadFail.setVisible(false);
 				cardID.setText("");
@@ -167,54 +174,50 @@ public class Menu {
 		});
 		panel_3.add(btnSave);
 
-		
-		JMenuItem mntmRegistration = new JMenuItem("Registration");
-		JMenuItem mntmEnd = new JMenuItem("End");
-		JMenuItem mntmStart = new JMenuItem("Start");
-		JMenuItem mntmConvertToXml = new JMenuItem("Convert to XML");
-		
 		JPanel startWindow = new JPanel();
 		fomenu.add(startWindow, "startWindow");
 		startWindow.setLayout(new BoxLayout(startWindow, BoxLayout.X_AXIS));
 
-		JButton btnReadCards = new JButton("Read cards");
+		JButton btnReadCards = new JButton("Start - kezdőpont");
 		btnReadCards.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				nfc = new NFC(cardData,0);
+				nfc = new NFC(cardData, 0);
 				nfc.setLevel(0); // ezzel a start fog elindulni
 				nfc.start();
 				c1.show(fomenu, "stopWindow");
-				mntmEnd.setEnabled(false);
+				btnStopReading.setEnabled(true);
 				mntmStart.setEnabled(false);
+				mntmEnd.setEnabled(false);
 			}
 		});
 		startWindow.add(btnReadCards);
-
 
 		JTextPane txtpnHaARead = new JTextPane();
 		txtpnHaARead
 				.setText("Ha a Read cards gomra kattintasz, elkezdőik a kártyák olvasása és a starthoz rögzítésre kerülnek az időbélyegeik.");
 		startWindow.add(txtpnHaARead);
-		
+
 		JPanel endWindow = new JPanel();
 		fomenu.add(endWindow, "endWindow");
 		endWindow.setLayout(new BoxLayout(endWindow, BoxLayout.X_AXIS));
-		
-		JButton button = new JButton("Read cards");
-		button.addActionListener(new ActionListener() {
+
+		JButton btnStartCllloms = new JButton("Start - célállomás");
+		btnStartCllloms.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				nfc = new NFC(cardData,1);
+				nfc = new NFC(cardData, 1);
 				nfc.setLevel(1); // ezzel az end fog elindulni.
 				nfc.start();
 				c1.show(fomenu, "stopWindow");
-				mntmEnd.setEnabled(false);
+				btnStopReading.setEnabled(true);
 				mntmStart.setEnabled(false);
+				mntmEnd.setEnabled(false);
 			}
 		});
-		endWindow.add(button);
-		
+		endWindow.add(btnStartCllloms);
+
 		JTextPane txtpnHaARead_1 = new JTextPane();
-		txtpnHaARead_1.setText("Ha a Read cards gomra kattintasz, elkezdőik a kártyák olvasása, és rögzítésre kerülnek a célállomáshoz.");
+		txtpnHaARead_1
+				.setText("Ha a Read cards gomra kattintasz, elkezdőik a kártyák olvasása, és rögzítésre kerülnek a célállomáshoz.");
 		endWindow.add(txtpnHaARead_1);
 
 		JPanel stopWindow = new JPanel();
@@ -225,55 +228,56 @@ public class Menu {
 				.setText("Ha a stop reading gombra kattintasz akkor megáll a kártyák beolvasása.");
 		stopWindow.add(txtpnHaAStop);
 
-		JButton btnStopReading = new JButton("Stop reading");
 		btnStopReading.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				nfc.done();
-				
-				//btnStopReading.setEnabled(false);
+
+				btnStopReading.setEnabled(false);
 				String log = cardData.printCards();
-				txtpnHaAStop.setText("A következő kártya logok történtek: \n" + log);
+				txtpnHaAStop.setText("A következő kártya logok történtek, az időbélyegek csak tájékoztató jellegűek: \n"
+						+ log);
 			}
 		});
 		stopWindow.add(btnStopReading);
 
-		
-
 		JPanel writexmlWindow = new JPanel();
 		fomenu.add(writexmlWindow, "writexmlWindow");
-		
+
 		JPanel eredmeny = new JPanel();
 		fomenu.add(eredmeny, "eredmeny");
 		eredmeny.setLayout(new BoxLayout(eredmeny, BoxLayout.PAGE_AXIS));
 		
-		JTextPane textPane = new JTextPane();
-		eredmeny.add(textPane);
+		JScrollPane scrollPane = new JScrollPane();
+		eredmeny.add(scrollPane);
 		
+		JTextPane textPane = new JTextPane();
+		scrollPane.setViewportView(textPane);
+
 		JButton btnEredmnyGenerls = new JButton("Eredmény generálás");
 		btnEredmnyGenerls.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				List<Runner> runners = new ArrayList<Runner>();
 				DBRunner.selectData(runners);
-				
-				for (Runner runner : runners){
-					runner.getTime();
-				}
-				
+
 				Collections.sort(runners, new Runner.OrderByTime());
-				String log="";
-				for (Runner runner : runners){
-					System.out.print(runner.getCardID() + "   ");
-					log+=runner.getCardID() + "   ";
+				String log = "";
+				for (Runner runner : runners) {
+					if (runner.getName() == null) {
+						System.out.print(runner.getCardID() + "\t");
+						log += runner.getCardID() + "\t";
+					} else {
+						System.out.print(runner.getName() + "\t");
+						log += runner.getName() + "\t";
+					}
+
 					System.out.println(runner.getTime());
-					log+=runner.getTime() + "\n";
+					log += runner.getTime() + "\n";
 				}
 				textPane.setText(log);
 			}
 		});
 		btnEredmnyGenerls.setAlignmentX(0.5f);
 		eredmeny.add(btnEredmnyGenerls);
-		
-
 
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -281,46 +285,40 @@ public class Menu {
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
-
-		
-		mntmRegistration.setSelected(true);
+		JMenuItem mntmRegistration = new JMenuItem("Regisztráció");
 		mnFile.add(mntmRegistration);
-		mnFile.add(mntmStart);
-		mnFile.add(mntmEnd);
-		mnFile.add(mntmConvertToXml);
-		
-		JMenuItem mntmEredmny = new JMenuItem("Eredmény gen.");
-		mntmEredmny.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				c1.show(fomenu, "eredmeny");
-			}
-		});
-		mnFile.add(mntmEredmny);
-		
+
+		mntmRegistration.setSelected(true);
+
 		mntmRegistration.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				c1.show(fomenu, "registerWindow");
 			}
 		});
-		
+
+		mnFile.add(mntmStart);
+
+		mnFile.add(mntmEnd);
+
+		JMenuItem mntmEredmny = new JMenuItem("Eredmény");
+		mnFile.add(mntmEredmny);
+		mntmEredmny.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				c1.show(fomenu, "eredmeny");
+			}
+		});
+
+		mntmEnd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				c1.show(fomenu, "endWindow");
+			}
+		});
+
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				c1.show(fomenu, "startWindow");
 			}
 		});
-		
-		mntmEnd.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				c1.show(fomenu,  "endWindow");
-			}
-		});
-		
-		mntmConvertToXml.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				c1.show(fomenu, "writexmlWindow");
-			}
-		});
-		
 
 	}
 

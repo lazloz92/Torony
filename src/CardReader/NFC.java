@@ -6,12 +6,15 @@ import java.util.List;
 
 import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
+import javax.smartcardio.CardException;
+import javax.smartcardio.CardNotPresentException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
 import Data.CardData;
+import Display.WrongCardReading;
 
 public class NFC extends Thread {
 	private volatile Thread blinker;
@@ -39,7 +42,21 @@ public class NFC extends Thread {
 			CardTerminal terminal = terminals.get(0);
 			do {
 
-				cards.put(cardRead(terminal),getCurrentTimeStamp(),level); 
+				try{
+					String kartya = cardRead(terminal);
+					if(kartya=="6300"){
+						throw new CardException(kartya);
+					}
+					cards.put(kartya,getCurrentTimeStamp(),level); 
+				}
+				catch(CardNotPresentException e){
+					System.out.println("nincs kártya vagy befejeztük a kártya olvasást");
+					//WrongCardReading.set();
+				}
+				catch(CardException e2){
+					e2.printStackTrace();
+					WrongCardReading.set();
+				}
 				
 				
 			} while (blinker == thisThread);
@@ -60,6 +77,7 @@ public class NFC extends Thread {
 	
 	public String readOneCard() throws Exception{
 		try {
+			blinker = Thread.currentThread();
 			// Display the list of terminals
 			TerminalFactory factory = TerminalFactory.getDefault();
 			List<CardTerminal> terminals = factory.terminals().list();
@@ -76,15 +94,15 @@ public class NFC extends Thread {
 
 	private String cardRead(CardTerminal terminal) throws Exception {
 		try {
+			Thread thisThread = Thread.currentThread();
 
-			while (!terminal.waitForCardPresent(1000));
+			while (!terminal.waitForCardPresent(1000) && blinker == thisThread );
 			// Connect with the card
 			Card card = terminal.connect("*");
 			CardChannel channel = card.getBasicChannel();
 
 			// Send Select Applet command
 			byte[] aid = { (byte) 0xFF, (byte) 0xCA, 0x00, 0x00, 0x04 };
-			//byte[] aid = { (byte) 0xFF, (byte) 0x40, (byte) 0x50, (byte) 0x04, (byte) 0x05, (byte) 0xC05, (byte) 0x03, (byte) 0x01, };
 			ResponseAPDU answer = channel.transmit(new CommandAPDU(aid));
 
 			byte r[] = answer.getBytes();

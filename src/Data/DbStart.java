@@ -52,11 +52,11 @@ public class DbStart {
 					System.out.println("no data");
 
 					// create the java mysql update preparedstatement
-					String query = "INSERT INTO `Runner`(`CardID`, `Start`) VALUES ( ? , ? )";
+					String query = "INSERT INTO `Runner`(`CardID`, `Start`) VALUES ( ? , CURRENT_TIMESTAMP )";
 					PreparedStatement preparedStmt = conn
 							.prepareStatement(query);
 					preparedStmt.setString(1, CardID);
-					preparedStmt.setString(2, Start);
+					//preparedStmt.setString(2, Start);
 
 					// execute the java preparedstatement
 					preparedStmt.executeUpdate();
@@ -64,11 +64,11 @@ public class DbStart {
 				} else {
 					System.out.println("no Start");
 					// create the java mysql update preparedstatement
-					String query = "UPDATE `Runner` SET Start = ? where CardID = ?";
+					String query = "UPDATE `Runner` SET Start = CURRENT_TIMESTAMP where CardID = ?";
 					PreparedStatement preparedStmt = conn
 							.prepareStatement(query);
-					preparedStmt.setString(1, Start);
-					preparedStmt.setString(2, CardID);
+					//preparedStmt.setString(1, Start);
+					preparedStmt.setString(1, CardID);
 
 					// execute the java preparedstatement
 					preparedStmt.executeUpdate();

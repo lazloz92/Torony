@@ -105,6 +105,10 @@ public class Runner implements Comparable<Runner> {
 	
 
 	public void setTime(String time) {
+		System.out.println(time);
+		if(time==null)
+			this.time="0";
+		else
 			this.time = time;
 	}
 

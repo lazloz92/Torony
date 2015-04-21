@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 import Display.NoConnection;
 
@@ -34,28 +35,33 @@ public class DbEnd {
 			System.out.println("Creating statement...");
 			stmt = conn.createStatement();
 			String sql;
-			sql = "SELECT `Id`, `CardID`, `Name`, `E-mail`, `Start`, `End`, `time`, `modifiedDate` FROM `Runner` where CardID ='"
-					+ CardID + "' and End is null";
-			ResultSet isnull = stmt.executeQuery(sql);
-			isnull.beforeFirst();
-			boolean bolla=!isnull.next();
 
 			sql = "SELECT `Id`, `CardID`, `Name`, `E-mail`, `Start`, `End`, `time`, `modifiedDate` FROM `Runner` where CardID ='"
 					+ CardID + "' and End is not null";
 			ResultSet isnotnull = stmt.executeQuery(sql);
 			isnotnull.beforeFirst();
-			boolean bol=!isnotnull.next();
+			boolean bol = !isnotnull.next();
+
+			sql = "SELECT `Id`, `CardID`, `Name`, `E-mail`, `Start`, `End`, `time`, `modifiedDate` FROM `Runner` where CardID ='"
+					+ CardID + "' and End is null";
+			ResultSet isnull = stmt.executeQuery(sql);
+			isnull.beforeFirst();
+			boolean bolla = !isnull.next();
+			Timestamp startTime = null;
+			if (!bolla) {
+				startTime = isnull.getTimestamp("Start");
+				System.out.println(startTime);
+			}
 
 			if (bol) {
 				if (bolla) {
 					System.out.println("no data");
 
 					// create the java mysql update preparedstatement
-					String query = "INSERT INTO `Runner`(`CardID`, `End`) VALUES ( ? , ? )";
+					String query = "INSERT INTO `Runner`(`CardID`, `End`) VALUES ( ? , CURRENT_TIMESTAMP )";
 					PreparedStatement preparedStmt = conn
 							.prepareStatement(query);
 					preparedStmt.setString(1, CardID);
-					preparedStmt.setString(2, End);
 
 					// execute the java preparedstatement
 					preparedStmt.executeUpdate();
@@ -63,11 +69,10 @@ public class DbEnd {
 				} else {
 					System.out.println("no End");
 					// create the java mysql update preparedstatement
-					String query = "UPDATE `Runner` SET End = ? where CardID = ?";
+					String query = "UPDATE `Runner` SET End = CURRENT_TIMESTAMP, time = TIMESTAMPDIFF(SECOND, ? ,CURRENT_TIMESTAMP )  where CardID = ?";
 					PreparedStatement preparedStmt = conn.prepareStatement(query);
-					preparedStmt.setString(1, End);
+					preparedStmt.setTimestamp(1, startTime);
 					preparedStmt.setString(2, CardID);
-				
 
 					// execute the java preparedstatement
 					preparedStmt.executeUpdate();

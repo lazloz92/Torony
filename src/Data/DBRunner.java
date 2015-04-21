@@ -44,9 +44,9 @@ public class DBRunner {
 				runner.setId(rs.getInt("Id"));
 				runner.setCardID(rs.getString("CardID"));
 				runner.setName(rs.getString("Name"));
-				runner.setEmail(rs.getString("E-mail"));
-				runner.setStart(rs.getString("Start"));
-				runner.setEnd(rs.getString("End"));
+				//runner.setEmail(rs.getString("E-mail"));
+				//runner.setStart(rs.getString("Start"));
+				//runner.setEnd(rs.getString("End"));
 				runner.setTime(rs.getString("time"));
  
 				runners.add(runner);
