@@ -27,14 +27,26 @@ import Data.UserData;
 import java.awt.Color;
 import java.awt.SystemColor;
 import java.awt.GridLayout;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
 
 public class Menu {
 
+	private static final Logger logger = Logger.getLogger( Menu.class.getName() );
+	
 	private JFrame frame;
 	private JPanel fomenu;
 	CardData cardData = new CardData();
@@ -51,8 +63,19 @@ public class Menu {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					LogManager.getLogManager().readConfiguration(new FileInputStream("mylogging.properties"));
+					Handler fileHandler = new FileHandler("logger.xml");
+					logger.addHandler(fileHandler);
+				} catch (SecurityException | IOException e1 ) {
+					e1.printStackTrace();
+				} 
+				logger.setLevel(Level.FINE);
+				logger.addHandler(new ConsoleHandler());
+				try {
+					logger.log(Level.INFO,"Belépünk a main metódusba.");
 					Menu window = new Menu();
 					window.frame.setVisible(true);
+			        logger.log(Level.INFO, "Ez az első log üzenet.");					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -113,8 +136,11 @@ public class Menu {
 		btnReadCard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					logger.log(Level.INFO, "Egy kártya olvasása kezdődik");
 					nfc = new NFC();
-					cardID.setText(nfc.readOneCard());
+					String cardId = nfc.readOneCard();
+					cardID.setText(cardId);
+					logger.log(Level.FINE, "A " + cardId + " kártya azonosító beolvasásra és kiírásra került.");
 					cardID.setEnabled(false);
 					txtpnReadFail.setVisible(false);
 				} catch (Exception e1) {
