@@ -4,11 +4,11 @@ public class General {
 
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://hal-9000.sch.bme.hu/wadon_dsk";
+	static final String DB_URL = "jdbc:mysql://";
 
 	// Database credentials
-	static final String USER = "dsk";
-	static final String PASS = "qfZXKf3a";
+	static final String USER = "";
+	static final String PASS = "";
 	
 	
 //	// JDBC driver name and database URL
